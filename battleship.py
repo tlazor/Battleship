@@ -27,58 +27,47 @@ def main():
 
 	myBoard, enemyBoard = setupBoard()
 
-	if host:
-		while(enemyHits < maxHits and myHits < maxHits):
-			userX, userY = raw_input("Please input an (X, Y) point in this format: X SPACE Y:\n").split()
-			
-			userX = int(userX)
-			userY = int(userY)
+	if host == False:
+		xCoord, yCoord = receiveGuess(connection)
+		hit = processGuess(myBoard, int(xCoord), int(yCoord))
+		answerGuess(connection, hit)
 
-			hit = guess(connection, userX, userY)
-			if hit:
-				myHits += 1
-				enemyBoard[userX][userY] = BoardSpot.HIT
-			else:
-				enemyBoard[userX][userY] = BoardSpot.MISS
+		print "My Board"
+		printBoard(myBoard)
 
-			print "Enemy's Board"
-			printBoard(enemyBoard)
+		if hit:
+			enemyHits += 1
+			print "The enemy hit one of your ships!"
+		else:
+			print "The enemy missed."
 
-			xCoord, yCoord = receiveGuess(connection)
-			hit = processGuess(myBoard, int(xCoord), int(yCoord))
-			answerGuess(connection, hit)
+	while(enemyHits < maxHits and myHits < maxHits):
+		userX, userY = raw_input("Please input an (X, Y) point in this format: X SPACE Y:\n").split()
+		
+		userX = int(userX)
+		userY = int(userY)
 
-			print "My Board"
-			printBoard(myBoard)
+		hit = guess(connection, userX, userY)
+		if hit:
+			myHits += 1
+			enemyBoard[userX][userY] = BoardSpot.HIT
+			print "You hit a ship!"
+		else:
+			enemyBoard[userX][userY] = BoardSpot.MISS
+			print "You missed."
 
-			if hit:
-				enemyHits += 1
-	else:
-		while(enemyHits < maxHits and myHits < maxHits):
-			xCoord, yCoord = receiveGuess(connection)
-			hit = processGuess(myBoard, int(xCoord), int(yCoord))
-			answerGuess(connection, hit)
+		print "Enemy's Board"
+		printBoard(enemyBoard)
 
-			print "My Board"
-			printBoard(myBoard)
+		xCoord, yCoord = receiveGuess(connection)
+		hit = processGuess(myBoard, int(xCoord), int(yCoord))
+		answerGuess(connection, hit)
 
-			if hit:
-				enemyHits += 1
+		print "My Board"
+		printBoard(myBoard)
 
-			userX, userY = raw_input("Please input an (X, Y) point in this format: X SPACE Y:\n").split()
-			
-			userX = int(userX)
-			userY = int(userY)
-
-			hit = guess(connection, userX, userY)
-			if hit:
-				myHits += 1
-				enemyBoard[userX][userY] = BoardSpot.HIT
-			else:
-				enemyBoard[userX][userY] = BoardSpot.MISS
-
-			print "Enemy's Board"
-			printBoard(enemyBoard)
+		if hit:
+			enemyHits += 1
 
 	print "GAME OVER"
 	if enemyHits >= maxHits:
@@ -136,8 +125,8 @@ def setupClient(host, port):
 	return clientSocket
 
 def setupBoard():
-	myBoard = [[BoardSpot.UNKNOWN for x in range(9)] for x in range(9)]
-	enemyBoard = [[BoardSpot.UNKNOWN for x in range(9)] for x in range(9)]
+	myBoard = [[BoardSpot.UNKNOWN for x in range(10)] for x in range(9)]
+	enemyBoard = [[BoardSpot.UNKNOWN for x in range(10)] for x in range(9)]
 
 	ships = ["Aircraft Carrier", "Battleship", "Destroyer", "Patrol Boat"]
 
