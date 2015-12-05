@@ -10,6 +10,9 @@ class BoardSpot:
 	SHIP = 'S'
 
 def main():
+	maxHits = 14
+	enemyHits = 0
+	myHits = 0
 
 	if len(sys.argv) == 3:
 		connection = setupHost(int(sys.argv[2]))
@@ -24,9 +27,64 @@ def main():
 
 	myBoard, enemyBoard = setupBoard()
 
-	printBoard(myBoard);
+	while(enemyHits < maxHits and myHits < maxHits):
+		userX, userY = raw_input("Please input an (X, Y) point in this format: X SPACE Y:\n").split()
+		
+		userX = int(userX)
+		userY = int(userY)
+
+		hit = guess(connection, userX, userY)
+		if hit:
+			myHits++
+			enemyBoard[userX][userY] = BoardSpot.HIT
+		else:
+			enemyBoard[userX][userY] = BoardSpot.MISS
+
+		xCoord, yCoord = receiveGuess(connection)
+		hit = processGuess(connection, myBoard, xCoord, yCoord)
+		answerGuess(connection, hit)
+
+		if hit:
+			enemyHits++
+
+	print "GAME OVER"
+	if enemyHits >= maxHits:
+		print "You LOST!"
+	else:
+		print "You WON!"
 
 	connection.close()
+
+def guess(connection, xCoord, yCoord):
+	connection.send(xCoord + " " + yCoord)
+	return receiveAnswer(connection)
+
+def receiveAnswer(connection):
+	answer = connection.recv(1)
+	if answer == 'H':
+		return True
+	else:
+		return False
+
+def answerGuess(connection, hit):
+	if hit:
+		connection.send('H')
+	else:
+		connection.send('M')
+
+def receiveGuess(connection):
+	xCoord, yCoord = connection.recv(3).split()
+	return xCoord, yCoord
+
+def processGuess(board, xCoord, yCoord):
+	hit = False
+	if board[xCoord][yCoord] == BoardSpot.SHIP:
+		board[xCoord][yCoord] = BoardSpot.HIT
+		hit = True
+	else
+		board[xCoord][yCoord] = BoardSpot.MISS
+
+	return hit 
 
 def setupHost(port):
 	hostSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -56,7 +114,7 @@ def setupBoard():
 
 		xcoord, ycoord, direction = userInput.split()
 
-		placeShip(myBoard, 5-x, xcoord, ycoord, direction)
+		placeShip(myBoard, 5-x, int(xcoord), int(ycoord), int(direction))
 
 		print xcoord, ycoord, direction
 
@@ -70,7 +128,7 @@ def printBoard(board):
 
 def placeShip(board, shipSize, xcoord, ycoord, direction):
 	
-	board[x][y] = BoardSpot.SHIP
+	board[xcoord][ycoord] = BoardSpot.SHIP
 
 if __name__ == '__main__':
 	main()
