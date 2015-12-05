@@ -27,25 +27,58 @@ def main():
 
 	myBoard, enemyBoard = setupBoard()
 
-	while(enemyHits < maxHits and myHits < maxHits):
-		userX, userY = raw_input("Please input an (X, Y) point in this format: X SPACE Y:\n").split()
-		
-		userX = int(userX)
-		userY = int(userY)
+	if host:
+		while(enemyHits < maxHits and myHits < maxHits):
+			userX, userY = raw_input("Please input an (X, Y) point in this format: X SPACE Y:\n").split()
+			
+			userX = int(userX)
+			userY = int(userY)
 
-		hit = guess(connection, userX, userY)
-		if hit:
-			myHits++
-			enemyBoard[userX][userY] = BoardSpot.HIT
-		else:
-			enemyBoard[userX][userY] = BoardSpot.MISS
+			hit = guess(connection, userX, userY)
+			if hit:
+				myHits += 1
+				enemyBoard[userX][userY] = BoardSpot.HIT
+			else:
+				enemyBoard[userX][userY] = BoardSpot.MISS
 
-		xCoord, yCoord = receiveGuess(connection)
-		hit = processGuess(connection, myBoard, xCoord, yCoord)
-		answerGuess(connection, hit)
+			print "Enemy's Board"
+			printBoard(enemyBoard)
 
-		if hit:
-			enemyHits++
+			xCoord, yCoord = receiveGuess(connection)
+			hit = processGuess(myBoard, int(xCoord), int(yCoord))
+			answerGuess(connection, hit)
+
+			print "My Board"
+			printBoard(myBoard)
+
+			if hit:
+				enemyHits += 1
+	else:
+		while(enemyHits < maxHits and myHits < maxHits):
+			xCoord, yCoord = receiveGuess(connection)
+			hit = processGuess(myBoard, int(xCoord), int(yCoord))
+			answerGuess(connection, hit)
+
+			print "My Board"
+			printBoard(myBoard)
+
+			if hit:
+				enemyHits += 1
+
+			userX, userY = raw_input("Please input an (X, Y) point in this format: X SPACE Y:\n").split()
+			
+			userX = int(userX)
+			userY = int(userY)
+
+			hit = guess(connection, userX, userY)
+			if hit:
+				myHits += 1
+				enemyBoard[userX][userY] = BoardSpot.HIT
+			else:
+				enemyBoard[userX][userY] = BoardSpot.MISS
+
+			print "Enemy's Board"
+			printBoard(enemyBoard)
 
 	print "GAME OVER"
 	if enemyHits >= maxHits:
@@ -56,7 +89,7 @@ def main():
 	connection.close()
 
 def guess(connection, xCoord, yCoord):
-	connection.send(xCoord + " " + yCoord)
+	connection.send(str(xCoord) + " " + str(yCoord))
 	return receiveAnswer(connection)
 
 def receiveAnswer(connection):
@@ -81,7 +114,7 @@ def processGuess(board, xCoord, yCoord):
 	if board[xCoord][yCoord] == BoardSpot.SHIP:
 		board[xCoord][yCoord] = BoardSpot.HIT
 		hit = True
-	else
+	else:
 		board[xCoord][yCoord] = BoardSpot.MISS
 
 	return hit 
@@ -115,8 +148,6 @@ def setupBoard():
 		xcoord, ycoord, direction = userInput.split()
 
 		placeShip(myBoard, 5-x, int(xcoord), int(ycoord), int(direction))
-
-		print xcoord, ycoord, direction
 
 	return (myBoard, enemyBoard)
 
