@@ -3,12 +3,14 @@
 import socket
 import sys
 
+#Class for the game board. Allows for the display of both players' ships
 class BoardSpot:
 	UNKNOWN = '?'
 	HIT = 'X'
 	MISS = 'O'
 	SHIP = 'S'
 
+#Main function for the game. Controls player connections and game flow. Also contains the victory condition.
 def main():
 	maxHits = 14
 	enemyHits = 0
@@ -77,10 +79,13 @@ def main():
 
 	connection.close()
 
+#Function for player to guess at enemy ship location
 def guess(connection, xCoord, yCoord):
 	connection.send(str(xCoord) + " " + str(yCoord))
 	return receiveAnswer(connection)
 
+#Receives hit answer.
+#Returns true if a hit, false if a miss
 def receiveAnswer(connection):
 	answer = connection.recv(1)
 	if answer == 'H':
@@ -88,16 +93,19 @@ def receiveAnswer(connection):
 	else:
 		return False
 
+#Sends hit answer, "H" for a hit, "M" for a miss
 def answerGuess(connection, hit):
 	if hit:
 		connection.send('H')
 	else:
 		connection.send('M')
 
+#Receives the guess. Returns the guess coordinates
 def receiveGuess(connection):
 	xCoord, yCoord = connection.recv(3).split()
 	return xCoord, yCoord
 
+#Checks the guess against the targetted board. Sets a spot to "H" if hit and returns true.
 def processGuess(board, xCoord, yCoord):
 	hit = False
 	if board[xCoord][yCoord] == BoardSpot.SHIP:
@@ -108,6 +116,7 @@ def processGuess(board, xCoord, yCoord):
 
 	return hit 
 
+#Sets up the host's connection
 def setupHost(port):
 	hostSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	hostSocket.bind(('0.0.0.0', port))
@@ -118,11 +127,13 @@ def setupHost(port):
 
 	return connection
 
+#Sets up the connection for the non-host player
 def setupClient(host, port):
 	clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	clientSocket.connect((host, port))
 
 	return clientSocket
+	
 #Initializes the boards and asks the players to set their ships. If invalid coordinates are used, asks them again
 def setupBoard():
 	myBoard = [[BoardSpot.UNKNOWN for x in range(10)] for x in range(9)]
@@ -167,6 +178,7 @@ def setupBoard():
 
 	return (myBoard, enemyBoard)
 
+#Displaye the current board
 def printBoard(board):
 	for x in board:
 		for y in x:
