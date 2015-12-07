@@ -123,7 +123,7 @@ def setupClient(host, port):
 	clientSocket.connect((host, port))
 
 	return clientSocket
-
+#Initializes the boards and asks the players to set their ships. If invalid coordinates are used, asks them again
 def setupBoard():
 	myBoard = [[BoardSpot.UNKNOWN for x in range(10)] for x in range(9)]
 	enemyBoard = [[BoardSpot.UNKNOWN for x in range(10)] for x in range(9)]
@@ -136,7 +136,34 @@ def setupBoard():
 
 		xcoord, ycoord, direction = userInput.split()
 
-		placeShip(myBoard, 5-x, int(xcoord), int(ycoord), int(direction))
+		#Should check both x- and y-coordinates to make sure the ship being placed doesn't go off the board
+		if (direction == 0)
+			if ((xcoord + 5-x > 9) || (xcoord < 0) || (ycoord < 0) || (ycoord > 9))
+				print "Insufficient Space, please re-enter coordinates."
+				x-=1
+			else
+				placeShip(myBoard, 5-x, int(xcoord), int(ycoord), int(direction))
+		elif (direction == 1)
+			if ((xcoord - 5-x < 0) || (xcoord > 9) || (ycoord > 9) || (ycoord < 0))
+				print "Insufficient Space, please re-enter coordinates."
+				x-=1
+			else
+				placeShip(myBoard, 5-x, int(xcoord), int(ycoord), int(direction))
+		elif (direction == 2)
+			if ((ycoord - 5-x < 0) || (ycoord > 9) || (xcoord < 0) || (xcoord > 9))
+				print "Insufficient Space, please re-enter coordinates."
+				x-=1
+			else
+				placeShip(myBoard, 5-x, int(xcoord), int(ycoord), int(direction))
+		elif (direction == 3)
+			if ((xcoord > 9) || (xcoord < 0) || (ycoord < 0) || (ycoord + 5-x > 9))
+				print "Insufficient Space, please re-enter coordinates."
+				x-=1
+			else
+				placeShip(myBoard, 5-x, int(xcoord), int(ycoord), int(direction))
+		else
+			print "Invalid coordinates, please try again.\n"
+			x-=1
 
 	return (myBoard, enemyBoard)
 
@@ -146,9 +173,22 @@ def printBoard(board):
 			print y, " ",
 		print "\n"
 
+#Places the ship onto user's desired position
 def placeShip(board, shipSize, xcoord, ycoord, direction):
 	
-	board[xcoord][ycoord] = BoardSpot.SHIP
+	i = 0
+	if (direction == 0)
+		for i < shipSize
+			board[xcoord + i][ycoord] = BoardSpot.SHIP
+	elif (direction == 1)
+		for i < shipSize
+			board[xcoord - i][ycoord] = BoardSpot.SHIP
+	elif (direction == 2)
+		for i < shipSize
+			board[xcoord][ycoord + i] = BoardSpot.SHIP
+	else
+		for i < shipSize
+			board[xcoord][ycoord - i] = BoardSpot.SHIP
 
 if __name__ == '__main__':
 	main()
