@@ -16,6 +16,8 @@ def main():
 	enemyHits = 0
 	myHits = 0
 
+	#Battleship.py must be run with the specified parameters
+	#Otherwise, the program will exit
 	if len(sys.argv) == 3:
 		connection = setupHost(int(sys.argv[2]))
 		host = True
@@ -27,8 +29,12 @@ def main():
 		print "       (2) python ", sys.argv[0], " join [host] [port]"
 		sys.exit()
 
+	#setup the boards
+	#myBoard is the board with the user's ships on it
+	#enemyBoard is the board the user will use to target the enemy's ships
 	myBoard, enemyBoard = setupBoard()
 
+	#if the user is not the host, they will wait for the host to make the first move
 	if host == False:
 		xCoord, yCoord = receiveGuess(connection)
 		hit = processGuess(myBoard, int(xCoord), int(yCoord))
@@ -36,6 +42,7 @@ def main():
 
 		print "My Board"
 		printBoard(myBoard)
+		print "The enemy guessed (", xCoord, ", ", yCoord, ")" 
 
 		if hit:
 			enemyHits += 1
@@ -43,8 +50,10 @@ def main():
 		else:
 			print "The enemy missed."
 
+	#if the user is the host, they guess first
+	#the main control flow is guess, update board, wait for enemy guess, answer, update board, repeat
 	while(enemyHits < maxHits and myHits < maxHits):
-		userX, userY = raw_input("Please input an (X, Y) point in this format: X SPACE Y:\n").split()
+		userX, userY = raw_input("Please input an (X, Y) point in this format: X [SPACE] Y:\n").split()
 		
 		userX = int(userX)
 		userY = int(userY)
@@ -178,7 +187,7 @@ def setupBoard():
 
 	return (myBoard, enemyBoard)
 
-#Displaye the current board
+#Display the current board
 def printBoard(board):
 	for x in board:
 		for y in x:
